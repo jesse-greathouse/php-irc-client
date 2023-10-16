@@ -1,5 +1,5 @@
 {
-    "name": "jerodev/php-irc-client",
+    "name": "jesse-greathouse/php-irc-client",
     "description": "PHP IRC client based on React",
     "type": "library",
     "license": "MIT",
