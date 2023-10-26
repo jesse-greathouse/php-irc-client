@@ -17,8 +17,10 @@ class NameReplyMessage extends IrcMessage
     {
         parent::__construct($message);
 
-        $this->channel = new IrcChannel(strstr($this->commandsuffix ?? '', '#'));
+       if ($this->commandsuffix) {
+        $this->channel = new IrcChannel(strstr($this->commandsuffix, '#'));
         $this->names = explode(' ', $this->payload);
+       }
     }
 
     public function handle(IrcClient $client, bool $force = false): void

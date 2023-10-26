@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Jerodev\PhpIrcClient;
 
 use Generator;
+use Jerodev\PhpIrcClient\Messages\DccMessage;
 use Jerodev\PhpIrcClient\Messages\IrcMessage;
+use Jerodev\PhpIrcClient\Messages\JoinMessage;
 use Jerodev\PhpIrcClient\Messages\InviteMessage;
 use Jerodev\PhpIrcClient\Messages\KickMessage;
 use Jerodev\PhpIrcClient\Messages\MOTDMessage;
 use Jerodev\PhpIrcClient\Messages\ModeMessage;
 use Jerodev\PhpIrcClient\Messages\NameReplyMessage;
+use Jerodev\PhpIrcClient\Messages\NoticeMessage;
 use Jerodev\PhpIrcClient\Messages\PingMessage;
 use Jerodev\PhpIrcClient\Messages\PrivmsgMessage;
 use Jerodev\PhpIrcClient\Messages\TopicChangeMessage;
@@ -41,6 +44,9 @@ class IrcMessageParser
     private function parseSingle(string $message): IrcMessage
     {
         switch ($this->getCommand($message)) {
+            case 'JOIN':
+                // print "\n=== JOIN === $message ===\n";
+                return new JoinMessage($message);
             case 'KICK':
                 return new KickMessage($message);
             case 'PING':
@@ -58,8 +64,13 @@ class IrcMessageParser
                 return new MOTDMessage($message);
             case 'MODE':
                 return new ModeMessage($message);
+            case 'NOTICE':
+                return new NoticeMessage($message);
             case 'INVITE':
                 return new InviteMessage($message);
+            case 'DCC':
+                print "\n=== DCC === $message ===\n";
+                return new DccMessage($message);
             default:
                 return new IrcMessage($message);
         }
@@ -70,8 +81,12 @@ class IrcMessageParser
      */
     private function getCommand(string $message): bool | string
     {
+
         if ($message[0] === ':') {
-            $message = trim(strstr($message, ' '));
+            $s = strstr($message, ' ');
+            if (false !== $s) {
+                $message = trim($s);
+            }
         }
 
         return strstr($message, ' ', true);

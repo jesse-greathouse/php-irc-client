@@ -15,7 +15,13 @@ class PrivmsgMessage extends IrcMessage
     public function __construct(string $message)
     {
         parent::__construct($message);
-        $this->user = strstr($this->source ?? '', '!', true);
+        $source = (!$this->source) ? '' : $this->source;
+        $user = strstr($source, '!', true);
+        if (false === $user) {
+            $user = '';
+        }
+        
+        $this->user = $user;
         $this->target = (string)$this->commandsuffix;
         $this->message = $this->payload;
     }
