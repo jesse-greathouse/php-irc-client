@@ -18,9 +18,21 @@ class ModeMessage extends IrcMessage
     {
         parent::__construct($command);
         if ('#' === $this->commandsuffix[0]) {
-            [$this->target, $this->mode] = explode(' ', $this->commandsuffix);
+            $suffixExp = explode(' ', $this->commandsuffix);
+
             $this->user = $this->payload;
-            $this->channel = new IrcChannel($this->target);
+            if (isset($suffixExp[0])) {
+                $this->target = $suffixExp[0];
+                $this->channel = new IrcChannel($this->target);
+            }
+
+            if (isset($suffixExp[1])) {
+                $this->mode = $suffixExp[1];
+            }
+
+            if (isset($suffixExp[2])) {
+                $this->user = $suffixExp[2];
+            }
         } else {
             $this->user = $this->commandsuffix;
             $this->mode = $this->payload;

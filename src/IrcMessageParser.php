@@ -45,7 +45,6 @@ class IrcMessageParser
     {
         switch ($this->getCommand($message)) {
             case 'JOIN':
-                // print "\n=== JOIN === $message ===\n";
                 return new JoinMessage($message);
             case 'KICK':
                 return new KickMessage($message);
@@ -69,7 +68,6 @@ class IrcMessageParser
             case 'INVITE':
                 return new InviteMessage($message);
             case 'DCC':
-                print "\n=== DCC === $message ===\n";
                 return new DccMessage($message);
             default:
                 return new IrcMessage($message);

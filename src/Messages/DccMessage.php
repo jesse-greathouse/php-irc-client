@@ -22,7 +22,13 @@ class DccMessage extends IrcMessage
     public function __construct(string $command)
     {
         parent::__construct($command);
-        [, $this->action, $this->fileName, $this->ip, $this->port, $this->fileSize] = explode(' ', $command);
+        $parts = explode(' ', $command);
+
+        foreach([ 1 => 'action', 2 => 'fileName', 3 => 'ip', 4 => 'port', 5 => 'fileSize'] as $key => $val) {
+            if (isset($parts[$key])) {
+                $this->{$val} = $parts[$key];
+            }
+        }
     }
 
     /**
