@@ -17,14 +17,13 @@ class NameReplyMessage extends IrcMessage
     {
         parent::__construct($message);
 
-       if ($this->commandsuffix) {
-        $channel = strstr($this->commandsuffix, '#');
-        if (false === $channel) {
-            $channel = $this->commandsuffix;
-        }
-
-        $this->channel = new IrcChannel($channel);
-        $this->names = explode(' ', $this->payload);
+        if ($this->commandsuffix) {
+            $channel = strstr($this->commandsuffix, '#');
+        
+            if (false !== $channel && '' !== $channel) {
+                $this->channel = new IrcChannel($channel);
+                $this->names = explode(' ', $this->payload);
+            }
        }
     }
 
@@ -34,7 +33,7 @@ class NameReplyMessage extends IrcMessage
             return;
         }
 
-        if (!empty($this->names)) {
+        if (null !== $this->channel && !empty($this->names)) {
             $client->getChannel($this->channel->getName())
                 ->setUsers($this->names);
         }
