@@ -21,7 +21,16 @@ class KickMessage extends IrcMessage
         [$this->kicker] = explode('!', $this->kicker);
         $this->kicker = substr($this->kicker, 1);
 
-        [$this->target, $this->user] = explode(' ', $this->commandsuffix ?? '');
+        $c = explode(' ', $this->commandsuffix ?? '');
+
+        if (isset($c[0])) {
+            $this->target = $c[0];
+        }
+
+        if (isset($c[1])) {
+            $this->user = $c[1];
+        }
+
         $this->message = $this->payload;
     }
 
