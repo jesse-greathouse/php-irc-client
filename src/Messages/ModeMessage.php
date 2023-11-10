@@ -23,15 +23,17 @@ class ModeMessage extends IrcMessage
             $this->user = $this->payload;
             if (isset($suffixExp[0])) {
                 $this->target = $suffixExp[0];
-                $this->channel = new IrcChannel($this->target);
-            }
+                if (null !== $this->target && '' !== $this->target) {
+                    $this->channel = new IrcChannel($this->target);
+                }
 
-            if (isset($suffixExp[1])) {
-                $this->mode = $suffixExp[1];
-            }
+                if (isset($suffixExp[1])) {
+                    $this->mode = $suffixExp[1];
 
-            if (isset($suffixExp[2])) {
-                $this->user = $suffixExp[2];
+                    if (isset($suffixExp[2])) {
+                        $this->user = $suffixExp[2];
+                    }
+                }
             }
         } else {
             $this->user = $this->commandsuffix;
