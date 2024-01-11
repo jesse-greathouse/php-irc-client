@@ -14,9 +14,10 @@ class JoinMessage extends IrcMessage
     public function __construct(string $message)
     {
         parent::__construct($message);
-        $source = (!$this->source) ? '' : $this->source;
-        $this->user = strstr($source, '!', true);
         $this->channelName = $this->payload;
+        $source = (!$this->source) ? '' : $this->source;
+        $user = strstr($source, '!', true);
+        $this->user = (false === $user) ? 'Unknown' : $user;
     }
 
     /**
