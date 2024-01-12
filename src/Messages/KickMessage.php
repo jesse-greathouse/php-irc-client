@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Jerodev\PhpIrcClient\Messages;
 
 use Jerodev\PhpIrcClient\Helpers\Event;
-use Jerodev\PhpIrcClient\IrcChannel;
 use Jerodev\PhpIrcClient\IrcClient;
 
 class KickMessage extends IrcMessage
 {
-    public string $message;
-    public string $kicker;
-    public string $user;
+    public $message;
+    public $kicker;
+    public $user;
 
     public function __construct(string $message)
     {
@@ -40,6 +39,10 @@ class KickMessage extends IrcMessage
     public function handle(IrcClient $client, bool $force = false): void
     {
         if ($this->handled && !$force) {
+            return;
+        }
+
+        if (null === $this->user) {
             return;
         }
 
