@@ -11,7 +11,7 @@ use Jerodev\PhpIrcClient\IrcClient;
 class NameReplyMessage extends IrcMessage
 {
     /** @var array<int, string> */
-    public array $names;
+    public array $names = [];
 
     public function __construct(string $message)
     {
@@ -20,7 +20,7 @@ class NameReplyMessage extends IrcMessage
         if ($this->commandsuffix) {
             $channel = strstr($this->commandsuffix, '#');
         
-            if (false !== $channel && '' !== $channel) {
+            if (false !== $channel && '' !== $channel && '#' !== $channel) {
                 $this->channel = new IrcChannel($channel);
                 $this->names = explode(' ', $this->payload);
             }

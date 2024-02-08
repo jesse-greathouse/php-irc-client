@@ -69,8 +69,10 @@ class IrcChannel
     public function setUsers(array $users): void
     {
         $this->users = array_map(function ($user): string {
-            if (in_array($user[0], ['+', '@'])) {
-                $user = substr($user, 1);
+            if (null !== $user && $user !== '') {
+                if (in_array($user[0], ['+', '@'])) {
+                    $user = substr($user, 1);
+                }
             }
 
             return $user;
