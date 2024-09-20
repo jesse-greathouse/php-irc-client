@@ -44,9 +44,13 @@ class NameReplyMessage extends IrcMessage
      */
     public function getEvents(): array
     {
-        return [
-            new Event('names', [$this->channel, $this->names]),
-            new Event(sprintf('names%s', $this->channel->getName()), [$this->names]),
-        ];
+        if (null !== $this->channel && !empty($this->names)) {
+            return [
+                new Event('names', [$this->channel, $this->names]),
+                new Event(sprintf('names%s', $this->channel->getName()), [$this->names]),
+            ];
+        } else {
+            return [];
+        }
     }
 }
