@@ -8,8 +8,19 @@ use Exception;
 
 class IrcChannel
 {
-    private string $name;
-    private ?string $topic;
+    /**
+     * Name of the channel.
+     *
+     * @var string
+     */
+    private $name;
+
+    /**
+     * Topic of the channel.
+     *
+     * @var string
+     */
+    private $topic;
 
     /** @var array<int, string> */
     private array $users = [];

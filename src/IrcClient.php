@@ -18,6 +18,9 @@ class IrcClient
     private EventHandlerCollection $messageEventHandlers;
     private ClientOptions $options;
     private ?IrcUser $user = null;
+    private $version;
+
+    const VERSION_DEFAULT = 'php-irc-client by Jesse Greathouse (https://github.com/jesse-greathouse/php-irc-client)';
 
     /**
      * Create a new IrcClient instance.
@@ -25,7 +28,7 @@ class IrcClient
      * @param string $server The server address to connect to including the port: `address:port`.
      * @param ClientOptions $options An object depicting options for this connection.
      */
-    public function __construct(string $server, ?ClientOptions $options = null)
+    public function __construct(string $server, ?ClientOptions $options = null, $version = null)
     {
         $this->options = $options ?? new ClientOptions();
         $this->connection = new IrcConnection($server, $this->options->connectionOptions());
@@ -40,6 +43,8 @@ class IrcClient
                 $this->channels[$channel] = new IrcChannel($channel);
             }
         }
+
+        $this->version = $version;
 
         if ($this->options->autoConnect) {
             $this->connect();
@@ -232,5 +237,19 @@ class IrcClient
     public function getConnection(): IrcConnection
     {
         return $this->connection;
+    }
+
+    public function getVersion(): string
+    {
+        if (null === $this->version) {
+            $this->version = self::VERSION_DEFAULT;
+        }
+
+        return $this->version;
+    }
+
+    public function setVersion(string $version): void
+    {
+        $this->version = $version;
     }
 }

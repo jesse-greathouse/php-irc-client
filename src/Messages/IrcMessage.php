@@ -23,6 +23,16 @@ class IrcMessage
     }
 
     /**
+     * Returns the parsed payload.
+     *
+     * @return string
+     */
+    public function getPayload(): string
+    {
+        return $this->payload;
+    }
+
+    /**
      * This function is always called after the message is parsed.
      * The handle will only be executed once unless forced.
      *

@@ -7,7 +7,7 @@ namespace Jerodev\PhpIrcClient\Messages;
 use Jerodev\PhpIrcClient\Helpers\Event;
 use Jerodev\PhpIrcClient\IrcClient;
 
-class PingMessage extends IrcMessage
+class VersionMessage extends IrcMessage
 {
     public function __construct(string $message)
     {
@@ -23,7 +23,7 @@ class PingMessage extends IrcMessage
             return;
         }
 
-        $client->send("PONG :$this->payload");
+        $client->send("VERSION " . $client->getVersion());
     }
 
     /**
@@ -32,7 +32,7 @@ class PingMessage extends IrcMessage
     public function getEvents(): array
     {
         return [
-            new Event('ping', [$this->payload]),
+            new Event('version', []),
         ];
     }
 }

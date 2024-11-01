@@ -16,7 +16,7 @@ class TopicChangeMessage extends IrcMessage
     {
         parent::__construct($message);
         $this->channel = new IrcChannel(strstr($this->commandsuffix ?? '', '#'));
-        $this->topic = $this->payload;
+        $this->topic = trim($this->payload);
     }
 
     /**
