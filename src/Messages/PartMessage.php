@@ -15,13 +15,23 @@ class PartMessage extends IrcMessage
     public function __construct(string $message)
     {
         parent::__construct($message);
-        [$this->user, , $channelName, $this->reason] = explode(' ', $message);
-        [$this->user] = explode('!', $this->user);
-        $this->user = substr($this->user, 1);
-        $this->reason = substr($this->reason, 1);
+        $parts = explode(' ', $message);
 
-        if (false !== $channelName && '' !== $channelName && '#' !== $channelName) {
-            $this->channel = new IrcChannel($channelName);
+        if (0 < count($parts)) {
+
+            // Get the essential variables from the string.
+            $this->user = $parts[0];
+            $channelName = (isset($parts[1])) ? $parts[1] : '';
+            $this->reason = (isset($parts[2])) ? $parts[2] : '';
+
+            // Additional string formatting.
+            [$this->user] = explode('!', $this->user);
+            $this->user = substr($this->user, 1);
+            $this->reason = substr($this->reason, 1);
+
+            if (false !== $channelName && '' !== $channelName && '#' !== $channelName) {
+                $this->channel = new IrcChannel($channelName);
+            }
         }
     }
 
