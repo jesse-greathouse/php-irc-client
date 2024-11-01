@@ -6,14 +6,16 @@ namespace Jerodev\PhpIrcClient\Messages;
 
 use Jerodev\PhpIrcClient\Helpers\Event;
 
-class NoticeMessage extends IrcMessage
+class ConsoleMessage extends IrcMessage
 {
     public string $message;
+    public string $user;
 
     public function __construct(string $command)
     {
         parent::__construct($command);
-        $this->message = trim("{$this->commandsuffix} {$this->payload}");
+        $this->user = trim($this->commandsuffix);
+        $this->message = trim($this->payload);
     }
 
     /**
@@ -22,7 +24,7 @@ class NoticeMessage extends IrcMessage
     public function getEvents(): array
     {
         return [
-            new Event('notice', [$this->message]),
+            new Event('console', [$this->user, $this->message]),
         ];
     }
 }
