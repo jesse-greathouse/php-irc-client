@@ -8,6 +8,8 @@ use Exception;
 
 class IrcChannel
 {
+    const PART_MASK = '/#PART\:\s(.*)$/is';
+
     /**
      * Name of the channel.
      *
@@ -28,11 +30,15 @@ class IrcChannel
     public function __construct(string $name)
     {
         $name = trim($name);
+
         if ('' === $name || '#' === $name) {
             throw new Exception('Channel name is empty.');
         }
 
+        $name = $this->namefromPartMsg($name);
+
         $this->name = $name;
+
         if ($this->name[0] !== '#') {
             $this->name = '#' . $this->name;
         }
@@ -88,5 +94,25 @@ class IrcChannel
 
             return $user;
         }, $users);
+    }
+
+    /**
+     * Attempts to get the chat name from a weird part message.
+     * Use case came from part message: user-name parted #PART: channel-name
+     *
+     * @param string $name
+     * @return string
+     */
+    private function namefromPartMsg(string $name): string|null
+    {
+        $matches = [];
+
+        preg_match(self::PART_MASK, $name, $matches);
+
+        if (1 < count($matches)) {
+            [, $name] = $matches;
+        }
+
+        return $name;
     }
 }
