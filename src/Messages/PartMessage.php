@@ -7,10 +7,12 @@ namespace Jerodev\PhpIrcClient\Messages;
 use Jerodev\PhpIrcClient\Helpers\Event;
 use Jerodev\PhpIrcClient\IrcChannel;
 
+use \Exception;
+
 class PartMessage extends IrcMessage
 {
-    // https://www.phpliveregex.com/p/MFa
-    const MASK = '/^\:(\S+)\!(\S+@\S+)\sPART\s(\S+)\s\:(.*)$/is';
+    // https://www.phpliveregex.com/p/MFw
+    const MASK = '/^\:(\S+)\!(\S+@\S+)\sPART\s(\S+)\s?(.*)$/is';
 
     public string $reason = '';
     public string $user = '';
@@ -29,12 +31,14 @@ class PartMessage extends IrcMessage
             if (null !== $channelName && '' !== $channelName && '#' !== $channelName) {
                 $this->channel = new IrcChannel($channelName);
             } else {
-                $this->channel = '';
+                throw new Exception(self::class . " cannot parse channel name from: $message");
             }
 
             $this->user = (null !== $user) ? $user : '';
 
             $this->reason = (null !== $reason) ? $reason : '';
+        } else {
+            throw new Exception(self::class . " cannot parse message: $message");
         }
     }
 
