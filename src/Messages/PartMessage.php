@@ -9,29 +9,32 @@ use Jerodev\PhpIrcClient\IrcChannel;
 
 class PartMessage extends IrcMessage
 {
+    // https://www.phpliveregex.com/p/MFa
+    const MASK = '/^\:(\S+)\!(\S+@\S+)\sPART\s(\S+)\s\:(.*)$/is';
+
     public $reason;
     public $user;
 
     public function __construct(string $message)
     {
         parent::__construct($message);
-        $parts = explode(' ', $message);
 
-        if (0 < count($parts)) {
+        $matches = [];
+        preg_match(self::MASK, $message, $matches, PREG_UNMATCHED_AS_NULL);
 
-            // Get the essential variables from the string.
-            $this->user = $parts[0];
-            $channelName = (isset($parts[1])) ? $parts[1] : '';
-            $this->reason = (isset($parts[2])) ? $parts[2] : '';
+        if (0 < count($matches)) {
 
-            // Additional string formatting.
-            [$this->user] = explode('!', $this->user);
-            $this->user = substr($this->user, 1);
-            $this->reason = substr($this->reason, 1);
+            [, $user, , $channelName, $reason] = $matches;
 
-            if (false !== $channelName && '' !== $channelName && '#' !== $channelName) {
+            if (null !== $channelName && '' !== $channelName && '#' !== $channelName) {
                 $this->channel = new IrcChannel($channelName);
+            } else {
+                $this->channel = '';
             }
+
+            $this->user = (null !== $user) ? $user : '';
+
+            $this->reason = (null !== $reason) ? $reason : '';
         }
     }
 
