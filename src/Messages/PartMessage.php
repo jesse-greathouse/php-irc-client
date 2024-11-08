@@ -12,8 +12,8 @@ class PartMessage extends IrcMessage
     // https://www.phpliveregex.com/p/MFa
     const MASK = '/^\:(\S+)\!(\S+@\S+)\sPART\s(\S+)\s\:(.*)$/is';
 
-    public $reason;
-    public $user;
+    public string $reason = '';
+    public string $user = '';
 
     public function __construct(string $message)
     {
