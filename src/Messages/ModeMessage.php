@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace Jerodev\PhpIrcClient\Messages;
 
-use Jerodev\PhpIrcClient\Helpers\Event;
-use Jerodev\PhpIrcClient\IrcChannel;
-use Jerodev\PhpIrcClient\IrcClient;
+use Jerodev\PhpIrcClient\Helpers\Event,
+    Jerodev\PhpIrcClient\IrcChannel,
+    Jerodev\PhpIrcClient\IrcClient;
 
 class ModeMessage extends IrcMessage
 {
+    const MODE_CHANGE_ADD = '+';
+    const MODE_CHANGE_REMOVE = '-';
+
+    const MODE_CHANGES = [
+        self::MODE_CHANGE_ADD,
+        self::MODE_CHANGE_REMOVE,
+    ];
+
     public string $mode;
     public ?string $target = null;
     public string $user;
@@ -39,6 +47,38 @@ class ModeMessage extends IrcMessage
             }
         } else {
             $this->user = $this->commandsuffix;
+        }
+    }
+
+    /**
+     * This function is always called after the message is parsed.
+     * The handle will only be executed once unless forced.
+     *
+     * @param IrcClient $client A reference to the irc client object
+     * @param bool $force Force handling this message even if already handled
+     */
+    public function handle(IrcClient $client, bool $force = false): void
+    {
+        if ($this->handled && !$force) {
+            return;
+        }
+
+        if ('' !== $this->user && null !== $this->channel) {
+            $change = $this->mode[0];
+            $mode = $this->mode[1];
+
+            if (in_array($change, self::MODE_CHANGES) && in_array($mode, IrcChannel::MODES)) {
+                $channel = $client->getChannel($this->channel->getName());
+
+                switch($change) {
+                    case self::MODE_CHANGE_ADD:
+                        $channel->addMode($this->user, $mode);
+                        break;
+                    case self::MODE_CHANGE_REMOVE:
+                        $channel->removeMode($this->user, $mode);
+                        break;
+                }
+            }
         }
     }
 

@@ -45,4 +45,12 @@ class EventHandlerCollection
             $handler(...$event->getArguments());
         }
     }
+
+    /**
+     * Returns a list of all the event handlers that are registered.
+     */
+    public function getEventHandlerList(): array
+    {
+        return array_keys($this->eventHandlers);
+    }
 }

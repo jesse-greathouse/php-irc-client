@@ -252,4 +252,39 @@ class IrcClient
     {
         $this->version = $version;
     }
+
+    /**
+     * Converts the properties of this class to an array.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        $nick = (null !== $this->user) ? sprintf("%s", $this->user) : null;
+        $channels = [];
+
+        foreach($this->getChannels() as $channel) {
+            $channels[$channel->getName()] = $channel->toArray();
+        }
+
+        return [
+            'user'              => $nick,
+            'version'           => $this->getVersion(),
+            'is_authenticated'  => $this->isAuthenticated,
+            'channels'          => $this->getChannels(),
+            'version'           => $this->getVersion(),
+            'connection'        => $this->getConnection()->toArray(),
+            'channels'          => $channels,
+        ];
+    }
+
+    /**
+     * Converts the properties of this class to JSON string.
+     *
+     * @return string
+     */
+    public function toJson(): string
+    {
+        return json_encode($this->toArray());
+    }
 }

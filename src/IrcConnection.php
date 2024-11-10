@@ -143,4 +143,19 @@ class IrcConnection
     {
         return $this->server;
     }
+
+    /**
+     * Converts the properties of this class to an array.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        $handlers = $this->eventHandlerCollection->getEventHandlerList();
+        return [
+            'server'            => $this->getServer(),
+            'is_connected'      => $this->isConnected(),
+            'event_handlers'    => $handlers,
+        ];
+    }
 }

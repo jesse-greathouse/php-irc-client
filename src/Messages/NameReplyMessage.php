@@ -19,7 +19,7 @@ class NameReplyMessage extends IrcMessage
 
         if ($this->commandsuffix) {
             $channel = strstr($this->commandsuffix, '#');
-        
+
             if (false !== $channel && '' !== $channel && '#' !== $channel) {
                 $this->channel = new IrcChannel($channel);
                 $this->names = explode(' ', $this->payload);
@@ -35,7 +35,7 @@ class NameReplyMessage extends IrcMessage
 
         if (null !== $this->channel && !empty($this->names)) {
             $client->getChannel($this->channel->getName())
-                ->setUsers($this->names);
+                ->addUser($this->names);
         }
     }
 

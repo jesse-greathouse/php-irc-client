@@ -48,6 +48,12 @@ class KickMessage extends IrcMessage
 
         if ($client->getNickname() === $this->user && $client->shouldAutoRejoin()) {
             $client->join($this->target);
+            return;
+        }
+
+        if ('' !== $this->user && null !== $this->channel->getName()) {
+            $client->getChannel($this->channel->getName())
+                ->removeUser($this->user);
         }
     }
 
