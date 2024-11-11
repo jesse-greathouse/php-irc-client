@@ -134,14 +134,12 @@ class IrcChannel
     {
         if ('string' === gettype($users)) $users = [$users];
 
-        $cleaned = array_map(function ($user) {
+        foreach($users as $user) {
             if (null !== $user && $user !== '') {
                 $user = $this->stripMode($user);
-                if (!in_array($user, $this->users)) return $user;
+                if (!in_array($user, $this->users)) $this->users[] = $user;
             }
-        }, $users);
-
-        $this->users = array_merge($this->users, $cleaned);
+        }
     }
 
     /**
@@ -164,6 +162,7 @@ class IrcChannel
             if (in_array($nick, $this->$list)) {
                 $index = array_search($nick, $this->$list);
                 unset($this->$list[$index]);
+                $this->$list = array_values($this->$list);
             }
         }
     }
@@ -206,6 +205,7 @@ class IrcChannel
         if (in_array($nick, $this->$list)) {
             $index = array_search($nick, $this->$list);
             unset($this->$list[$index]);
+            $this->$list = array_values($this->$list);
         }
     }
 

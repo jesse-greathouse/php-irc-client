@@ -71,6 +71,7 @@ class IrcConnection
             $this->connection->on('close', function () {
                 $this->connected = false;
             });
+
             $this->connection->on('end', function () {
                 $this->connected = false;
             });
@@ -139,6 +140,16 @@ class IrcConnection
         $this->eventHandlerCollection->invoke(new Event('data', [$message]));
     }
 
+    /**
+     * returns the instance of this connection.
+     *
+     * @return ConnectionInterface|null
+     */
+    public function getConnection(): ConnectionInterface|null
+    {
+        return $this->connection;
+    }
+
     public function getServer(): string
     {
         return $this->server;
@@ -157,5 +168,16 @@ class IrcConnection
             'is_connected'      => $this->isConnected(),
             'event_handlers'    => $handlers,
         ];
+    }
+
+    /**
+     * Set the value of connected
+     *
+     * @param bool $connected
+     * @return void
+     */
+    public function setConnected(bool $connected): void
+    {
+        $this->connected = $connected;
     }
 }
