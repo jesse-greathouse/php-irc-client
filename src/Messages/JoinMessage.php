@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Jerodev\PhpIrcClient\Messages;
 
-use Jerodev\PhpIrcClient\Helpers\Event,
+use
+    Jerodev\PhpIrcClient\Exceptions\ParseChannelNameException,
+    Jerodev\PhpIrcClient\Helpers\Event,
     Jerodev\PhpIrcClient\IrcChannel,
     Jerodev\PhpIrcClient\IrcClient;
 
@@ -23,7 +25,7 @@ class JoinMessage extends IrcMessage
         if (null !== $this->channelName && '' !== $this->channelName && '#' !== $this->channelName) {
             $this->channel = new IrcChannel($this->channelName);
         } else {
-            throw new Exception(self::class . " cannot parse channel name from: $message");
+            throw new ParseChannelNameException(self::class . " cannot parse channel name from: $message");
         }
 
         $source = (!$this->source) ? '' : $this->source;
