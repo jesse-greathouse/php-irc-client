@@ -1,6 +1,6 @@
 <?php
 
-namespace Jerodev\PhpIrcClient\Exceptions;
+namespace JesseGreathouse\PhpIrcClient\Exceptions;
 
 use Exception;
 

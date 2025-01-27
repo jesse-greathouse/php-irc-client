@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Jerodev\PhpIrcClient\Messages;
+namespace JesseGreathouse\PhpIrcClient\Messages;
 
-use Jerodev\PhpIrcClient\Helpers\Event,
-    Jerodev\PhpIrcClient\IrcClient;
+use JesseGreathouse\PhpIrcClient\Helpers\Event,
+    JesseGreathouse\PhpIrcClient\IrcClient;
 
 class QuitMessage extends IrcMessage
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jerodev\PhpIrcClient;
+namespace JesseGreathouse\PhpIrcClient;
 
 /**
  * Map of somewhat human-readable reply names to numeric reply codes.

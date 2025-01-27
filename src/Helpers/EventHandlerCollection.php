@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jerodev\PhpIrcClient\Helpers;
+namespace JesseGreathouse\PhpIrcClient\Helpers;
 
 class EventHandlerCollection
 {

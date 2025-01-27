@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Jerodev\PhpIrcClient\IrcUser;
+use JesseGreathouse\PhpIrcClient\IrcUser;
 
 final class IrcUserTest extends TestCase
 {

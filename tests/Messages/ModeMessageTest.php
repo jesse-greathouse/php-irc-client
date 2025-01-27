@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Jerodev\PhpIrcClient\Messages\ModeMessage;
+use JesseGreathouse\PhpIrcClient\Messages\ModeMessage;
 use PHPUnit\Framework\TestCase;
 
 /**

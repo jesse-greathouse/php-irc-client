@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 require_once './vendor/autoload.php';
 
-use Jerodev\PhpIrcClient\IrcClient;
-use Jerodev\PhpIrcClient\IrcChannel;
-use Jerodev\PhpIrcClient\Options\ClientOptions;
+use JesseGreathouse\PhpIrcClient\IrcClient;
+use JesseGreathouse\PhpIrcClient\IrcChannel;
+use JesseGreathouse\PhpIrcClient\Options\ClientOptions;
 
 // Set the IRC network to connect to and the port if you're not connecting to
 // Freenode.

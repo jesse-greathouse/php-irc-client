@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Helpers;
 
-use Jerodev\PhpIrcClient\Helpers\Event;
+use JesseGreathouse\PhpIrcClient\Helpers\Event;
 use Tests\TestCase;
 
 final class EventTest extends TestCase

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Helpers;
 
-use Jerodev\PhpIrcClient\Helpers\Event;
-use Jerodev\PhpIrcClient\Helpers\EventHandlerCollection as Collection;
+use JesseGreathouse\PhpIrcClient\Helpers\Event;
+use JesseGreathouse\PhpIrcClient\Helpers\EventHandlerCollection as Collection;
 use Tests\TestCase;
 
 final class EventHandlerCollectionTest extends TestCase

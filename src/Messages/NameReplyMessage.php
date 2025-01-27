@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Jerodev\PhpIrcClient\Messages;
+namespace JesseGreathouse\PhpIrcClient\Messages;
 
-use Jerodev\PhpIrcClient\Helpers\Event;
-use Jerodev\PhpIrcClient\IrcChannel;
-use Jerodev\PhpIrcClient\IrcClient;
+use JesseGreathouse\PhpIrcClient\Helpers\Event;
+use JesseGreathouse\PhpIrcClient\IrcChannel;
+use JesseGreathouse\PhpIrcClient\IrcClient;
 
 class NameReplyMessage extends IrcMessage
 {

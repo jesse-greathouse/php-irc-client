@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Jerodev\PhpIrcClient\Helpers\Event;
-use Jerodev\PhpIrcClient\Helpers\EventHandlerCollection;
-use Jerodev\PhpIrcClient\IrcChannel;
-use Jerodev\PhpIrcClient\IrcClient;
-use Jerodev\PhpIrcClient\IrcConnection;
-use Jerodev\PhpIrcClient\IrcMessageParser;
+use JesseGreathouse\PhpIrcClient\Helpers\Event;
+use JesseGreathouse\PhpIrcClient\Helpers\EventHandlerCollection;
+use JesseGreathouse\PhpIrcClient\IrcChannel;
+use JesseGreathouse\PhpIrcClient\IrcClient;
+use JesseGreathouse\PhpIrcClient\IrcConnection;
+use JesseGreathouse\PhpIrcClient\IrcMessageParser;
 
 class IrcMessageEventTest extends TestCase
 {
     public function testKick(): void
     {
         $this->invokeClientEvents(
-            ':Jerodev!~Jerodev@foo.bar.be KICK #channel user :Get out!',
+            ':JesseGreathouse!~JesseGreathouse@foo.bar.be KICK #channel user :Get out!',
             [[new Event(
                 'kick',
-                [new IrcChannel('#channel'), 'user', 'Jerodev', 'Get out!']
+                [new IrcChannel('#channel'), 'user', 'JesseGreathouse', 'Get out!']
             )]]
         );
     }
@@ -27,7 +27,7 @@ class IrcMessageEventTest extends TestCase
     public function testMOTD(): void
     {
         $this->invokeClientEvents(
-            ':Jerodev!~Jerodev@foo.bar.be 372 IrcBot :Message of the day',
+            ':JesseGreathouse!~JesseGreathouse@foo.bar.be 372 IrcBot :Message of the day',
             [[new Event('motd', ['Message of the day'])]]
         );
     }
@@ -35,7 +35,7 @@ class IrcMessageEventTest extends TestCase
     public function testNamesEvent(): void
     {
         $this->invokeClientEvents(
-            ':Jerodev!~Jerodev@foo.bar.be 353 IrcBot = #channel :IrcBot @Q OtherUser',
+            ':JesseGreathouse!~JesseGreathouse@foo.bar.be 353 IrcBot = #channel :IrcBot @Q OtherUser',
             [
                 [new Event('names', [new IrcChannel('#channel'), ['IrcBot', '@Q', 'OtherUser']])],
                 [new Event('names#channel', [['IrcBot', '@Q', 'OtherUser']])],
@@ -55,10 +55,10 @@ class IrcMessageEventTest extends TestCase
     public function testPrivmsgEvent(): void
     {
         $this->invokeClientEvents(
-            ':Jerodev!~Jerodev@foo.bar.be PRIVMSG #channel :Hello World!',
+            ':JesseGreathouse!~JesseGreathouse@foo.bar.be PRIVMSG #channel :Hello World!',
             [
-                [new Event('message', ['Jerodev', new IrcChannel('#channel'), 'Hello World!'])],
-                [new Event('message#channel', ['Jerodev', new IrcChannel('#channel'), 'Hello World!'])],
+                [new Event('message', ['JesseGreathouse', new IrcChannel('#channel'), 'Hello World!'])],
+                [new Event('message#channel', ['JesseGreathouse', new IrcChannel('#channel'), 'Hello World!'])],
             ]
         );
     }
@@ -66,7 +66,7 @@ class IrcMessageEventTest extends TestCase
     public function testTopicChangeEvent(): void
     {
         $this->invokeClientEvents(
-            ':Jerodev!~Jerodev@foo.bar.be TOPIC #channel :My Topic',
+            ':JesseGreathouse!~JesseGreathouse@foo.bar.be TOPIC #channel :My Topic',
             [[new Event('topic', [new IrcChannel('#channel'), 'My Topic'])]]
         );
     }

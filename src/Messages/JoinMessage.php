@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Jerodev\PhpIrcClient\Messages;
+namespace JesseGreathouse\PhpIrcClient\Messages;
 
 use
-    Jerodev\PhpIrcClient\Exceptions\ParseChannelNameException,
-    Jerodev\PhpIrcClient\Helpers\Event,
-    Jerodev\PhpIrcClient\IrcChannel,
-    Jerodev\PhpIrcClient\IrcClient;
+    JesseGreathouse\PhpIrcClient\Exceptions\ParseChannelNameException,
+    JesseGreathouse\PhpIrcClient\Helpers\Event,
+    JesseGreathouse\PhpIrcClient\IrcChannel,
+    JesseGreathouse\PhpIrcClient\IrcClient;
 
 use \Exception;
 

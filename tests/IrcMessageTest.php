@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Jerodev\PhpIrcClient\IrcMessageParser;
-use Jerodev\PhpIrcClient\Messages\IrcMessage;
-use Jerodev\PhpIrcClient\Messages\MOTDMessage;
-use Jerodev\PhpIrcClient\Messages\NameReplyMessage;
-use Jerodev\PhpIrcClient\Messages\PingMessage;
-use Jerodev\PhpIrcClient\Messages\PrivmsgMessage;
-use Jerodev\PhpIrcClient\Messages\TopicChangeMessage;
+use JesseGreathouse\PhpIrcClient\IrcMessageParser;
+use JesseGreathouse\PhpIrcClient\Messages\IrcMessage;
+use JesseGreathouse\PhpIrcClient\Messages\MOTDMessage;
+use JesseGreathouse\PhpIrcClient\Messages\NameReplyMessage;
+use JesseGreathouse\PhpIrcClient\Messages\PingMessage;
+use JesseGreathouse\PhpIrcClient\Messages\PrivmsgMessage;
+use JesseGreathouse\PhpIrcClient\Messages\TopicChangeMessage;
 
 class IrcMessageTest extends TestCase
 {
@@ -27,9 +27,9 @@ class IrcMessageTest extends TestCase
 
     public function testParseMotd(): void
     {
-        $msg = new MOTDMessage(':Jerodev!~Jerodev@foo.bar.be 372 IrcBot :Message of the day');
+        $msg = new MOTDMessage(':JesseGreathouse!~JesseGreathouse@foo.bar.be 372 IrcBot :Message of the day');
 
-        $this->assertSame('Jerodev!~Jerodev@foo.bar.be', $this->getPrivate($msg, 'source'));
+        $this->assertSame('JesseGreathouse!~JesseGreathouse@foo.bar.be', $this->getPrivate($msg, 'source'));
         $this->assertSame('372', $this->getPrivate($msg, 'command'));
         $this->assertSame('IrcBot', $this->getPrivate($msg, 'commandsuffix'));
         $this->assertSame('Message of the day', $this->getPrivate($msg, 'payload'));
@@ -37,9 +37,9 @@ class IrcMessageTest extends TestCase
 
     public function testParseNameReply(): void
     {
-        $msg = new NameReplyMessage(':Jerodev!~Jerodev@foo.bar.be 353 IrcBot = #channel :IrcBot @Q OtherUser');
+        $msg = new NameReplyMessage(':JesseGreathouse!~JesseGreathouse@foo.bar.be 353 IrcBot = #channel :IrcBot @Q OtherUser');
 
-        $this->assertSame('Jerodev!~Jerodev@foo.bar.be', $this->getPrivate($msg, 'source'));
+        $this->assertSame('JesseGreathouse!~JesseGreathouse@foo.bar.be', $this->getPrivate($msg, 'source'));
         $this->assertSame('353', $this->getPrivate($msg, 'command'));
         $this->assertSame('IrcBot = #channel', $this->getPrivate($msg, 'commandsuffix'));
         $this->assertSame('IrcBot @Q OtherUser', $this->getPrivate($msg, 'payload'));
@@ -49,9 +49,9 @@ class IrcMessageTest extends TestCase
 
     public function testParseTopicReply(): void
     {
-        $msg = new IrcMessage(':Jerodev!~Jerodev@foo.bar.be TOPIC #channel :The newest channel topic!');
+        $msg = new IrcMessage(':JesseGreathouse!~JesseGreathouse@foo.bar.be TOPIC #channel :The newest channel topic!');
 
-        $this->assertSame('Jerodev!~Jerodev@foo.bar.be', $this->getPrivate($msg, 'source'));
+        $this->assertSame('JesseGreathouse!~JesseGreathouse@foo.bar.be', $this->getPrivate($msg, 'source'));
         $this->assertSame('TOPIC', $this->getPrivate($msg, 'command'));
         $this->assertSame('#channel', $this->getPrivate($msg, 'commandsuffix'));
         $this->assertSame('The newest channel topic!', $this->getPrivate($msg, 'payload'));
@@ -59,9 +59,9 @@ class IrcMessageTest extends TestCase
 
     public function testParseTopicReplyNumeric(): void
     {
-        $msg = new TopicChangeMessage(':Jerodev!~Jerodev@foo.bar.be 332 BotName #channel :The newest channel topic!!');
+        $msg = new TopicChangeMessage(':JesseGreathouse!~JesseGreathouse@foo.bar.be 332 BotName #channel :The newest channel topic!!');
 
-        $this->assertSame('Jerodev!~Jerodev@foo.bar.be', $this->getPrivate($msg, 'source'));
+        $this->assertSame('JesseGreathouse!~JesseGreathouse@foo.bar.be', $this->getPrivate($msg, 'source'));
         $this->assertSame('332', $this->getPrivate($msg, 'command'));
         $this->assertSame('#channel', $msg->channel->getName());
         $this->assertSame('The newest channel topic!!', $msg->topic);
@@ -69,10 +69,10 @@ class IrcMessageTest extends TestCase
 
     public function testParseUserMessage(): void
     {
-        $msg = new PrivmsgMessage(':Jerodev!~Jerodev@foo.bar.be PRIVMSG #channel :Hello World!');
+        $msg = new PrivmsgMessage(':JesseGreathouse!~JesseGreathouse@foo.bar.be PRIVMSG #channel :Hello World!');
 
-        $this->assertSame('Jerodev!~Jerodev@foo.bar.be', $this->getPrivate($msg, 'source'));
-        $this->assertSame('Jerodev', $msg->user);
+        $this->assertSame('JesseGreathouse!~JesseGreathouse@foo.bar.be', $this->getPrivate($msg, 'source'));
+        $this->assertSame('JesseGreathouse', $msg->user);
         $this->assertSame('PRIVMSG', $this->getPrivate($msg, 'command'));
         $this->assertSame('#channel', $msg->target);
         $this->assertSame('#channel', $this->getPrivate($msg, 'commandsuffix'));

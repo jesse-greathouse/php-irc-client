@@ -6,7 +6,7 @@ namespace Tests;
 
 use Error;
 use Exception;
-use Jerodev\PhpIrcClient\IrcChannel;
+use JesseGreathouse\PhpIrcClient\IrcChannel;
 
 final class IrcChannelTest extends TestCase
 {

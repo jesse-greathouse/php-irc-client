@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Exception;
-use Jerodev\PhpIrcClient\IrcConnection;
+use JesseGreathouse\PhpIrcClient\IrcConnection;
 
 final class IrcConnectionTest extends TestCase
 {

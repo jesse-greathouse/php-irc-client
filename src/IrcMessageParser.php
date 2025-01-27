@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace Jerodev\PhpIrcClient;
+namespace JesseGreathouse\PhpIrcClient;
 
 use Generator;
-use Jerodev\PhpIrcClient\Messages\ConsoleMessage;
-use Jerodev\PhpIrcClient\Messages\CtcpMessage;
-use Jerodev\PhpIrcClient\Messages\DccMessage;
-use Jerodev\PhpIrcClient\Messages\IrcMessage;
-use Jerodev\PhpIrcClient\Messages\JoinMessage;
-use Jerodev\PhpIrcClient\Messages\InviteMessage;
-use Jerodev\PhpIrcClient\Messages\KickMessage;
-use Jerodev\PhpIrcClient\Messages\MOTDMessage;
-use Jerodev\PhpIrcClient\Messages\ModeMessage;
-use Jerodev\PhpIrcClient\Messages\NameReplyMessage;
-use Jerodev\PhpIrcClient\Messages\NickMessage;
-use Jerodev\PhpIrcClient\Messages\NoticeMessage;
-use Jerodev\PhpIrcClient\Messages\PartMessage;
-use Jerodev\PhpIrcClient\Messages\PingMessage;
-use Jerodev\PhpIrcClient\Messages\PrivmsgMessage;
-use Jerodev\PhpIrcClient\Messages\QuitMessage;
-use Jerodev\PhpIrcClient\Messages\TopicChangeMessage;
-use Jerodev\PhpIrcClient\Messages\VersionMessage;
-use Jerodev\PhpIrcClient\Messages\WelcomeMessage;
+use JesseGreathouse\PhpIrcClient\Messages\ConsoleMessage;
+use JesseGreathouse\PhpIrcClient\Messages\CtcpMessage;
+use JesseGreathouse\PhpIrcClient\Messages\DccMessage;
+use JesseGreathouse\PhpIrcClient\Messages\IrcMessage;
+use JesseGreathouse\PhpIrcClient\Messages\JoinMessage;
+use JesseGreathouse\PhpIrcClient\Messages\InviteMessage;
+use JesseGreathouse\PhpIrcClient\Messages\KickMessage;
+use JesseGreathouse\PhpIrcClient\Messages\MOTDMessage;
+use JesseGreathouse\PhpIrcClient\Messages\ModeMessage;
+use JesseGreathouse\PhpIrcClient\Messages\NameReplyMessage;
+use JesseGreathouse\PhpIrcClient\Messages\NickMessage;
+use JesseGreathouse\PhpIrcClient\Messages\NoticeMessage;
+use JesseGreathouse\PhpIrcClient\Messages\PartMessage;
+use JesseGreathouse\PhpIrcClient\Messages\PingMessage;
+use JesseGreathouse\PhpIrcClient\Messages\PrivmsgMessage;
+use JesseGreathouse\PhpIrcClient\Messages\QuitMessage;
+use JesseGreathouse\PhpIrcClient\Messages\TopicChangeMessage;
+use JesseGreathouse\PhpIrcClient\Messages\VersionMessage;
+use JesseGreathouse\PhpIrcClient\Messages\WelcomeMessage;
 
 class IrcMessageParser
 {

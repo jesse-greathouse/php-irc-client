@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Jerodev\PhpIrcClient\Messages;
+namespace JesseGreathouse\PhpIrcClient\Messages;
 
-use Jerodev\PhpIrcClient\Helpers\Event;
+use JesseGreathouse\PhpIrcClient\Helpers\Event;
 
 class MOTDMessage extends IrcMessage
 {

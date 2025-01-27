@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Jerodev\PhpIrcClient\Messages;
+namespace JesseGreathouse\PhpIrcClient\Messages;
 
-use Jerodev\PhpIrcClient\Helpers\Event,
-    Jerodev\PhpIrcClient\IrcChannel,
-    Jerodev\PhpIrcClient\IrcClient;
+use JesseGreathouse\PhpIrcClient\Helpers\Event,
+    JesseGreathouse\PhpIrcClient\IrcChannel,
+    JesseGreathouse\PhpIrcClient\IrcClient;
 
 use \Exception;
 

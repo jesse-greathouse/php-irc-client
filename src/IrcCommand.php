@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jerodev\PhpIrcClient;
+namespace JesseGreathouse\PhpIrcClient;
 
 final class IrcCommand
 {

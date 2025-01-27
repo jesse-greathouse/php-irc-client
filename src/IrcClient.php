@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Jerodev\PhpIrcClient;
+namespace JesseGreathouse\PhpIrcClient;
 
 use Exception;
-use Jerodev\PhpIrcClient\Helpers\EventHandlerCollection;
-use Jerodev\PhpIrcClient\Messages\IrcMessage;
-use Jerodev\PhpIrcClient\Options\ClientOptions;
+use JesseGreathouse\PhpIrcClient\Helpers\EventHandlerCollection;
+use JesseGreathouse\PhpIrcClient\Messages\IrcMessage;
+use JesseGreathouse\PhpIrcClient\Options\ClientOptions;
 
 class IrcClient
 {

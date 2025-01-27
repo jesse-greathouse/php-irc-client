@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Jerodev\PhpIrcClient\IrcMessageParser;
-use Jerodev\PhpIrcClient\Messages\InviteMessage;
-use Jerodev\PhpIrcClient\Messages\IrcMessage;
-use Jerodev\PhpIrcClient\Messages\KickMessage;
-use Jerodev\PhpIrcClient\Messages\MOTDMessage;
-use Jerodev\PhpIrcClient\Messages\ModeMessage;
-use Jerodev\PhpIrcClient\Messages\WelcomeMessage;
+use JesseGreathouse\PhpIrcClient\IrcMessageParser;
+use JesseGreathouse\PhpIrcClient\Messages\InviteMessage;
+use JesseGreathouse\PhpIrcClient\Messages\IrcMessage;
+use JesseGreathouse\PhpIrcClient\Messages\KickMessage;
+use JesseGreathouse\PhpIrcClient\Messages\MOTDMessage;
+use JesseGreathouse\PhpIrcClient\Messages\ModeMessage;
+use JesseGreathouse\PhpIrcClient\Messages\WelcomeMessage;
 
 final class IrcMessageParserTest extends TestCase
 {

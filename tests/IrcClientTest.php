@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests;
 
 use Exception;
-use Jerodev\PhpIrcClient\IrcClient;
-use Jerodev\PhpIrcClient\Options\ClientOptions;
+use JesseGreathouse\PhpIrcClient\IrcClient;
+use JesseGreathouse\PhpIrcClient\Options\ClientOptions;
 
 final class IrcClientTest extends TestCase
 {

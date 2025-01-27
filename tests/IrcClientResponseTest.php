@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Jerodev\PhpIrcClient\IrcClient;
-use Jerodev\PhpIrcClient\IrcMessageParser;
-use Jerodev\PhpIrcClient\Options\ClientOptions;
+use JesseGreathouse\PhpIrcClient\IrcClient;
+use JesseGreathouse\PhpIrcClient\IrcMessageParser;
+use JesseGreathouse\PhpIrcClient\Options\ClientOptions;
 
 class IrcClientResponseTest extends TestCase
 {

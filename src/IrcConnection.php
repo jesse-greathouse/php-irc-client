@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Jerodev\PhpIrcClient;
+namespace JesseGreathouse\PhpIrcClient;
 
 use Exception;
-use Jerodev\PhpIrcClient\Helpers\Event;
-use Jerodev\PhpIrcClient\Helpers\EventHandlerCollection;
-use Jerodev\PhpIrcClient\Messages\IrcMessage;
-use Jerodev\PhpIrcClient\Options\ConnectionOptions;
+use JesseGreathouse\PhpIrcClient\Helpers\Event;
+use JesseGreathouse\PhpIrcClient\Helpers\EventHandlerCollection;
+use JesseGreathouse\PhpIrcClient\Messages\IrcMessage;
+use JesseGreathouse\PhpIrcClient\Options\ConnectionOptions;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionInterface;
 

@@ -1,6 +1,4 @@
 # PHP IRC Client
-[![Build Status](https://travis-ci.com/jerodev/php-irc-client.svg?branch=master)](https://travis-ci.com/jerodev/php-irc-client) [![StyleCI](https://github.styleci.io/repos/173153410/shield?branch=master)](https://github.styleci.io/repos/173153410) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/jerodev/php-irc-client/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/jerodev/php-irc-client/?branch=master)
-
 A pure PHP IRC client based on [ReactPHP](https://reactphp.org/).
 
 ## Documentation
@@ -25,9 +23,9 @@ A pure PHP IRC client based on [ReactPHP](https://reactphp.org/).
 
 The client is the heart of the library, this object is used to perform all communication between your application and the IRC server. It will manage the connection to the IRC server and has all functions needed to interact with the server.
 
-    use Jerodev\PhpIrcClient\IrcClient;
+    use JesseGreathouse\PhpIrcClient\IrcClient;
 
-    $client = new IrcClient('irc.server:6667', 'Jerodev');
+    $client = new IrcClient('irc.server:6667', 'JesseGreathouse');
     $client->connect();
 
 ### <a name="client-connect"></a> Connecting to the server

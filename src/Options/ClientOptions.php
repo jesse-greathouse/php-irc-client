@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jerodev\PhpIrcClient\Options;
+namespace JesseGreathouse\PhpIrcClient\Options;
 
 class ClientOptions
 {
