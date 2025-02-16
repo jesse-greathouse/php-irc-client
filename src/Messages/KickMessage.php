@@ -4,37 +4,51 @@ declare(strict_types=1);
 
 namespace JesseGreathouse\PhpIrcClient\Messages;
 
-use JesseGreathouse\PhpIrcClient\Helpers\Event;
-use JesseGreathouse\PhpIrcClient\IrcClient;
+use JesseGreathouse\PhpIrcClient\Helpers\Event,
+    JesseGreathouse\PhpIrcClient\IrcClient,
+    JesseGreathouse\PhpIrcClient\IrcClientEvent;
 
 class KickMessage extends IrcMessage
 {
-    public $message;
-    public $kicker;
-    public $user;
 
+    /** @var string The message received in the kick event. */
+    public string $message;
+
+    /** @var string The nickname of the user who kicked the bot. */
+    public string $kicker;
+
+    /** @var string The nickname of the user being kicked. */
+    public string $user;
+
+    /**
+     * Constructor for the KickMessage class.
+     *
+     * @param string $message The raw IRC message
+     */
     public function __construct(string $message)
     {
         parent::__construct($message);
-        [$this->kicker] = explode(' ', $message);
-        [$this->kicker] = explode('!', $this->kicker);
-        $this->kicker = substr($this->kicker, 1);
 
-        $c = explode(' ', $this->commandsuffix ?? '');
+        // Extract kicker information from the message
+        $this->kicker = strtok($message, '!');
+        $this->kicker = ltrim($this->kicker, '@');
 
-        if (isset($c[0])) {
-            $this->target = $c[0];
-        }
+        // Split the command suffix to get target and user details
+        $c = explode(' ', $this->commandSuffix ?? '');
 
-        if (isset($c[1])) {
-            $this->user = $c[1];
-        }
+        $this->target = $c[0] ?? null;
+        $this->user = $c[1] ?? null;
 
         $this->message = $this->payload;
     }
 
     /**
-     * When the bot is kicked form a channel, it might need to auto-rejoin.
+     * Handle the kick event, potentially making the bot auto-rejoin a channel.
+     *
+     * @param IrcClient $client The IRC client instance
+     * @param bool $force Whether to force re-handling of the message
+     *
+     * @return void
      */
     public function handle(IrcClient $client, bool $force = false): void
     {
@@ -46,11 +60,13 @@ class KickMessage extends IrcMessage
             return;
         }
 
+        // If the bot is kicked, auto-rejoin if it's the bot's nickname
         if ($client->getNickname() === $this->user && $client->shouldAutoRejoin()) {
             $client->join($this->target);
             return;
         }
 
+        // Remove user from the channel if the user is not empty
         if ('' !== $this->user && null !== $this->channel->getName()) {
             $client->getChannel($this->channel->getName())
                 ->removeUser($this->user);
@@ -58,13 +74,15 @@ class KickMessage extends IrcMessage
     }
 
     /**
-     * @return array<int, Event>
+     * Get the events triggered by this message.
+     *
+     * @return array<int, Event> Array of Event objects representing the triggered events
      */
     public function getEvents(): array
     {
         return [
             new Event(
-                'kick',
+                IrcClientEvent::KICK,
                 [$this->channel, $this->user, $this->kicker, $this->message]
             ),
         ];

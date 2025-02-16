@@ -4,20 +4,35 @@ declare(strict_types=1);
 
 namespace JesseGreathouse\PhpIrcClient\Messages;
 
-use JesseGreathouse\PhpIrcClient\Helpers\Event,
+use JesseGreathouse\PhpIrcClient\Exceptions\ParseChannelNameException,
+    JesseGreathouse\PhpIrcClient\Exceptions\ParseMessageException,
+    JesseGreathouse\PhpIrcClient\Helpers\Event,
     JesseGreathouse\PhpIrcClient\IrcChannel,
-    JesseGreathouse\PhpIrcClient\IrcClient;
-
-use \Exception;
+    JesseGreathouse\PhpIrcClient\IrcClient,
+    JesseGreathouse\PhpIrcClient\IrcClientEvent;
 
 class PartMessage extends IrcMessage
 {
-    // https://www.phpliveregex.com/p/MFw
+    /** Regular expression to match PART message format
+     * https://www.phpliveregex.com/p/MFw
+     */
     const MASK = '/^\:(\S+)\!(\S+@\S+)\sPART\s(\S+)\s?(.*)$/is';
 
+    /** @var string The reason for the PART message */
     public string $reason = '';
+
+    /** @var string The user who sent the PART message */
     public string $user = '';
 
+    /**
+     * Constructor for the PartMessage class.
+     * This constructor parses the provided message using a regular expression to extract user, channel, and reason.
+     *
+     * @param string $message The raw IRC PART message to parse
+     *
+     * @throws ParseChannelNameException If the channel name cannot be parsed from the message
+     * @throws ParseMessageException If the message does not match the expected format
+     */
     public function __construct(string $message)
     {
         parent::__construct($message);
@@ -25,30 +40,27 @@ class PartMessage extends IrcMessage
         $matches = [];
         preg_match(self::MASK, $message, $matches, PREG_UNMATCHED_AS_NULL);
 
-        if (0 < count($matches)) {
-
+        if (count($matches) > 0) {
             [, $user, , $channelName, $reason] = $matches;
 
             if (null !== $channelName && '' !== $channelName && '#' !== $channelName) {
                 $this->channel = new IrcChannel($channelName);
             } else {
-                throw new Exception(self::class . " cannot parse channel name from: $message");
+                throw new ParseChannelNameException(self::class . " cannot parse channel name from: $message");
             }
 
-            $this->user = (null !== $user) ? $user : '';
-
-            $this->reason = (null !== $reason) ? $reason : '';
+            $this->user = $user ?? '';
+            $this->reason = $reason ?? '';
         } else {
-            throw new Exception(self::class . " cannot parse message: $message");
+            throw new ParseMessageException(self::class . " cannot parse message: $message");
         }
     }
 
     /**
-     * This function is always called after the message is parsed.
-     * The handle will only be executed once unless forced.
+     * Handles the PART message by removing the user from the channel if applicable.
      *
-     * @param IrcClient $client A reference to the irc client object
-     * @param bool $force Force handling this message even if already handled
+     * @param IrcClient $client The IRC client instance
+     * @param bool $force If true, forces handling even if the message was already handled
      */
     public function handle(IrcClient $client, bool $force = false): void
     {
@@ -63,12 +75,15 @@ class PartMessage extends IrcMessage
     }
 
     /**
-     * @return array<int, Event>
+     * Returns the events associated with this PART message.
+     * This typically includes an event that signals the user has partied from the channel.
+     *
+     * @return array<int, Event> An array of Event objects representing the events
      */
     public function getEvents(): array
     {
         return [
-            new Event('part', [$this->user, $this->channel, $this->reason]),
+            new Event(IrcClientEvent::PART, [$this->user, $this->channel, $this->reason]),
         ];
     }
 }

@@ -6,24 +6,17 @@ namespace JesseGreathouse\PhpIrcClient\Options;
 
 class ClientOptions
 {
-    /**
-     * Automaticly connect to the IRC server when creating the client.
-     */
+    /** Automatically connect to the IRC server when creating the client. */
     public bool $autoConnect = false;
 
-    /**
-     * Automaticly rejoin a channel when kicked.
-     */
+    /** Automatically rejoin a channel when kicked. */
     public bool $autoRejoin = false;
 
-    /**
-     * The amount of time in milliseconds to wait between sending messages to
-     * the IRC server.
-     */
+    /** The amount of time in milliseconds to wait between sending messages to the IRC server. */
     public int $floodProtectionDelay = 750;
 
     /**
-     * @param string $nickname The nickname used on the IRC server.
+     * @param string|null $nickname The nickname used on the IRC server.
      * @param array<int, string> $channels The channels to join on connection.
      */
     public function __construct(
@@ -34,7 +27,8 @@ class ClientOptions
 
     /**
      * Get the options for the IrcConnection from this collection.
-     * @return ConnectionOptions
+     *
+     * @return ConnectionOptions The connection options with flood protection delay set.
      */
     public function connectionOptions(): ConnectionOptions
     {

@@ -4,40 +4,56 @@ declare(strict_types=1);
 
 namespace JesseGreathouse\PhpIrcClient\Messages;
 
-use JesseGreathouse\PhpIrcClient\Helpers\Event;
-use JesseGreathouse\PhpIrcClient\IrcChannel;
-use JesseGreathouse\PhpIrcClient\IrcClient;
+use JesseGreathouse\PhpIrcClient\IrcClientEvent,
+    JesseGreathouse\PhpIrcClient\Helpers\Event;
 
+/**
+ * Represents a DCC (Direct Client-to-Client) message received via IRC.
+ */
 class DccMessage extends IrcMessage
 {
-    /**
-     * Name of the user inviting the client to.
-     */
-    public $action;
-    public $fileName;
-    public $ip;
-    public $port;
-    public $fileSize;
+    /** @var string Name of the DCC action (e.g., SEND, CHAT). */
+    public string $action;
 
+    /** @var string|null Name of the file being transferred (if applicable). */
+    public ?string $fileName = null;
+
+    /** @var string|null IP address of the sender. */
+    public ?string $ip = null;
+
+    /** @var int|null Port number for the connection. */
+    public ?int $port = null;
+
+    /** @var int|null File size if applicable. */
+    public ?int $fileSize = null;
+
+    /**
+     * Initializes the DccMessage instance.
+     *
+     * @param string $command The raw DCC command.
+     */
     public function __construct(string $command)
     {
         parent::__construct($command);
+
         $parts = explode(' ', $command);
 
-        foreach([ 1 => 'action', 2 => 'fileName', 3 => 'ip', 4 => 'port', 5 => 'fileSize'] as $key => $val) {
-            if (isset($parts[$key])) {
-                $this->{$val} = $parts[$key];
-            }
-        }
+        $this->action = $parts[1] ?? '';
+        $this->fileName = $parts[2] ?? null;
+        $this->ip = $parts[3] ?? null;
+        $this->port = isset($parts[4]) ? (int) $parts[4] : null;
+        $this->fileSize = isset($parts[5]) ? (int) $parts[5] : null;
     }
 
     /**
-     * @return array<int, Event>
+     * Retrieves an array of events triggered by this message.
+     *
+     * @return Event[] List of events associated with this DCC message.
      */
     public function getEvents(): array
     {
         return [
-            new Event('dcc', [$this->fileName, $this->ip, $this->port, $this->fileSize]),
+            new Event(IrcClientEvent::DCC, [$this->fileName, $this->ip, $this->port, $this->fileSize])
         ];
     }
 }

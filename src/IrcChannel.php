@@ -4,17 +4,25 @@ declare(strict_types=1);
 
 namespace JesseGreathouse\PhpIrcClient;
 
-use Exception;
+use JesseGreathouse\PhpIrcClient\Exceptions\InvalidModeException,
+    JesseGreathouse\PhpIrcClient\Exceptions\InvalidNameException;
 
+
+/**
+ * Represents an IRC channel with user and mode management.
+ */
 class IrcChannel
 {
+    // Regex pattern for extracting channel name from PART message
     const PART_MASK = '/#PART\:\s(.*)$/is';
 
+    // Channel user modes
     const MODE_OP = 'o';
     const MODE_VOICE = 'v';
     const MODE_AWAY = 'a';
     const MODE_BAN = 'b';
 
+    // List of available modes
     const MODES = [
         self::MODE_OP,
         self::MODE_VOICE,
@@ -22,6 +30,7 @@ class IrcChannel
         self::MODE_BAN,
     ];
 
+    // Mapping of mode symbols to their corresponding mode names
     const MODE_MAP = [
         self::MODE_OP       => 'op',
         self::MODE_VOICE    => 'voice',
@@ -29,206 +38,142 @@ class IrcChannel
         self::MODE_BAN      => 'ban',
     ];
 
-    /**
-     * Name of the channel.
-     *
-     * @var string
-     */
-    private $name;
+    /** @var string Name of the channel */
+    private string $name;
 
-    /**
-     * Topic of the channel.
-     *
-     * @var string
-     */
-    private $topic;
+    /** @var string|null Topic of the channel */
+    private ?string $topic = null;
 
-    /** @var array<int, string> */
+    /** @var array<int, string> List of users on the channel */
     private array $users = [];
 
-    /** @var array<int, string> */
+    /** @var array<int, string> List of users with voice mode */
     private array $voice = [];
 
-    /** @var array<int, string> */
+    /** @var array<int, string> List of users with op mode */
     private array $op = [];
 
-    /** @var array<int, string> */
+    /** @var array<int, string> List of users with away mode */
     private array $away = [];
 
-    /** @var array<int, string> */
+    /** @var array<int, string> List of banned users */
     private array $ban = [];
 
+    /**
+     * IrcChannel constructor.
+     *
+     * @param string $name Name of the channel
+     * @throws InvalidNameException if the channel name is invalid
+     */
     public function __construct(string $name)
     {
         $name = trim($name);
 
-        if ('' === $name || '#' === $name) {
-            throw new Exception('Channel name is empty.');
+        if ($name === '' || $name === '#') {
+            throw new InvalidNameException('Channel name is empty.');
         }
 
-        $name = $this->namefromPartMsg($name);
+        // Ensure the name is extracted correctly and always remains a string
+        $this->name = $this->nameFromPartMsg($name) ?: $name;
 
-        $this->name = $name;
-
-        if ($this->name[0] !== '#') {
-            $this->name = '#' . $this->name;
+        // Prepend "#" if missing
+        if (!str_starts_with($this->name, '#')) {
+            $this->name = "#{$this->name}";
         }
     }
 
     /**
-     * Fetch the name of the channel, including the `#`.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the current channel topic.
-     */
-    public function getTopic(): ?string
-    {
-        return $this->topic;
-    }
-
-    /**
-     * Fetch the list of users currently on this channel.
-     * @return array<int, string>
-     */
-    public function getUsers(): array
-    {
-        return $this->users;
-    }
-
-    /**
-     * Set the current channel topic.
-     * @param string $topic The topic
-     */
-    public function setTopic(string $topic): void
-    {
-        $this->topic = $topic;
-    }
-
-    /**
-     * Set the list of active users on the channel.
-     * @param array<int, string> $users An array of user names.
-     */
-    public function setUsers(array $users): void
-    {
-        $this->users = array_map(function ($user): string {
-            if (null !== $user && $user !== '') {
-                $user = $this->stripMode($user);
-            }
-
-            return $user;
-        }, $users);
-    }
-
-    /**
-     * Appends a single string or list to users.
+     * Add one or more users to the channel.
      *
-     * @param string|array $users
-     * @return void
+     * @param string|array $users Single user or array of users to add
      */
     public function addUser(string|array $users): void
     {
-        if ('string' === gettype($users)) $users = [$users];
+        if (is_string($users)) {
+            $users = [$users];
+        }
 
-        foreach($users as $user) {
-            if (null !== $user && $user !== '') {
-                $user = $this->stripMode($user);
-                if (!in_array($user, $this->users)) $this->users[] = $user;
+        foreach ($users as $user) {
+            if ($user && !in_array($user, $this->users, true)) {
+                $this->users[] = $this->stripMode($user);
             }
         }
     }
 
     /**
-     * Removes a user from lists.
+     * Remove a user from all lists except ban.
      *
-     * @param string $nick
-     * @return void
+     * @param string $nick Nickname of the user to remove
      */
     public function removeUser(string $nick): void
     {
-        // Remove nick from all lists except ban.
-        $lists = [
-            'users',
-            self::MODE_MAP[self::MODE_OP],
-            self::MODE_MAP[self::MODE_VOICE],
-            self::MODE_MAP[self::MODE_AWAY],
-        ];
+        $lists = ['users', 'op', 'voice', 'away'];
 
         foreach ($lists as $list) {
-            if (in_array($nick, $this->$list)) {
-                $index = array_search($nick, $this->$list);
+            $index = array_search($nick, $this->$list, true);
+            if ($index !== false) {
                 unset($this->$list[$index]);
-                $this->$list = array_values($this->$list);
+                $this->$list = array_values($this->$list); // Re-index array
             }
         }
     }
 
     /**
-     * Adds a mode to a user.
+     * Add a mode to a user.
      *
-     * @param string $nick
-     * @param string $mode
-     * @return void
+     * @param string $nick Nickname of the user
+     * @param string $mode Mode to add
+     * @throws InvalidModeException if the mode is unknown
      */
     public function addMode(string $nick, string $mode): void
     {
-        if (!in_array($mode, array_keys(self::MODE_MAP))) {
-            throw new Exception("Add mode on: $nick with unknown mode: $mode");
+        if (!in_array($mode, self::MODES, true)) {
+            throw new InvalidModeException("Unknown mode: $mode for user: $nick");
         }
 
         $list = self::MODE_MAP[$mode];
-
-        if (!in_array($nick, $this->$list)) {
+        if (!in_array($nick, $this->$list, true)) {
             $this->$list[] = $nick;
         }
     }
 
     /**
-     * Removes a mode to a user.
+     * Remove a mode from a user.
      *
-     * @param string $nick
-     * @param string $mode
-     * @return void
+     * @param string $nick Nickname of the user
+     * @param string $mode Mode to remove
+     * @throws InvalidModeException if the mode is unknown
      */
     public function removeMode(string $nick, string $mode): void
     {
-        if (!in_array($mode, array_keys(self::MODE_MAP))) {
-            throw new Exception("Remove mode on: $nick with unknown mode: $mode");
+        if (!in_array($mode, self::MODES, true)) {
+            throw new InvalidModeException("Unknown mode: $mode for user: $nick");
         }
 
         $list = self::MODE_MAP[$mode];
-
-        if (in_array($nick, $this->$list)) {
-            $index = array_search($nick, $this->$list);
+        $index = array_search($nick, $this->$list, true);
+        if ($index !== false) {
             unset($this->$list[$index]);
-            $this->$list = array_values($this->$list);
+            $this->$list = array_values($this->$list); // Re-index array
         }
     }
 
     /**
      * User modes (`+`, `@`) will be removed from the nicknames.
-     *
-     * @string $user
+     * @param string $user
      * @return string
      */
-    public function stripMode($user): string
+    public function stripMode(string $user): string
     {
         $firstChar = $user[0];
         if (in_array($firstChar, ['+', '@'])) {
             $user = substr($user, 1);
-            switch($firstChar) {
+            switch ($firstChar) {
                 case '+':
                     $this->addVoice($user);
                     break;
                 case '@':
                     $this->addOp($user);
-                    break;
-                default:
-                    // User has no voice or op.
                     break;
             }
         }
@@ -237,7 +182,8 @@ class IrcChannel
     }
 
     /**
-     * Helper Method for addMode
+     * Adds an operator mode to a user.
+     * @param string $nick
      */
     public function addOp(string $nick): void
     {
@@ -245,15 +191,17 @@ class IrcChannel
     }
 
     /**
-     * Helper Method for removeMode
+     * Removes an operator mode from a user.
+     * @param string $nick
      */
-    Public function removeOp(string $nick): void
+    public function removeOp(string $nick): void
     {
         $this->removeMode($nick, self::MODE_OP);
     }
 
-   /**
-     * Helper Method for addMode
+    /**
+     * Adds a voice mode to a user.
+     * @param string $nick
      */
     public function addVoice(string $nick): void
     {
@@ -261,15 +209,17 @@ class IrcChannel
     }
 
     /**
-     * Helper Method for removeMode
+     * Removes a voice mode from a user.
+     * @param string $nick
      */
-    Public function removeVoice(string $nick): void
+    public function removeVoice(string $nick): void
     {
         $this->removeMode($nick, self::MODE_VOICE);
     }
 
-   /**
-     * Helper Method for addMode
+    /**
+     * Adds an away mode to a user.
+     * @param string $nick
      */
     public function addAway(string $nick): void
     {
@@ -277,15 +227,17 @@ class IrcChannel
     }
 
     /**
-     * Helper Method for removeMode
+     * Removes an away mode from a user.
+     * @param string $nick
      */
-    Public function removeAway(string $nick): void
+    public function removeAway(string $nick): void
     {
         $this->removeMode($nick, self::MODE_AWAY);
     }
 
-   /**
-     * Helper Method for addMode
+    /**
+     * Adds a ban mode to a user.
+     * @param string $nick
      */
     public function addBan(string $nick): void
     {
@@ -293,17 +245,18 @@ class IrcChannel
     }
 
     /**
-     * Helper Method for removeMode
+     * Removes a ban mode from a user.
+     * @param string $nick
      */
-    Public function removeBan(string $nick): void
+    public function removeBan(string $nick): void
     {
         $this->removeMode($nick, self::MODE_BAN);
     }
 
     /**
-     * Converts the properties of this class to an array.
+     * Convert class properties to an array.
      *
-     * @return array
+     * @return array Array representation of the channel
      */
     public function toArray(): array
     {
@@ -319,9 +272,9 @@ class IrcChannel
     }
 
     /**
-     * Converts the properties of this class to JSON string.
+     * Convert class properties to a JSON string.
      *
-     * @return string
+     * @return string JSON string representation of the channel
      */
     public function toJson(): string
     {
@@ -329,35 +282,21 @@ class IrcChannel
     }
 
     /**
-     * Attempts to get the chat name from a weird part message.
-     * Use case came from part message: user-name parted #PART: channel-name
+     * Extract the channel name from a PART message.
      *
-     * @param string $name
-     * @return string
+     * @param string $msg Message to extract the name from
+     * @return string|null The extracted channel name, or null if not found
      */
-    private function namefromPartMsg(string $name): string|null
+    private function nameFromPartMsg(string $msg): ?string
     {
-        $matches = [];
-
-        preg_match(self::PART_MASK, $name, $matches);
-
-        if (1 < count($matches)) {
-            [, $name] = $matches;
-        }
-
-        return $name;
+        preg_match(self::PART_MASK, $msg, $matches);
+        return $matches[1] ?? null;
     }
 
     /**
-     * Get the usernames with the voice mode.
-     */
-    public function getVoice(): array
-    {
-        return $this->voice;
-    }
-
-    /**
-     * Get the usernames with op mode.
+     * Get the list of users with op mode.
+     *
+     * @return array<int, string> List of users with op mode
      */
     public function getOp(): array
     {
@@ -365,7 +304,19 @@ class IrcChannel
     }
 
     /**
-     * Get the usernames with away mode.
+     * Get the list of users with voice mode.
+     *
+     * @return array<int, string> List of users with voice mode
+     */
+    public function getVoice(): array
+    {
+        return $this->voice;
+    }
+
+    /**
+     * Get the list of users with away mode.
+     *
+     * @return array<int, string> List of users with away mode
      */
     public function getAway(): array
     {
@@ -373,10 +324,62 @@ class IrcChannel
     }
 
     /**
-     * Get the usernames with bad mode.
+     * Get the list of banned users.
+     *
+     * @return array<int, string> List of banned users
      */
-    public function getBan()
+    public function getBan(): array
     {
         return $this->ban;
+    }
+
+    /**
+     * Fetch the name of the channel.
+     *
+     * @return string The channel name
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get the current channel topic.
+     *
+     * @return string|null The channel topic, or null if none
+     */
+    public function getTopic(): ?string
+    {
+        return $this->topic;
+    }
+
+    /**
+     * Set the current channel topic.
+     *
+     * @param string $topic The topic to set
+     */
+    public function setTopic(string $topic): void
+    {
+        $this->topic = $topic;
+    }
+
+    /**
+     * Fetch the list of users currently on this channel.
+     *
+     * @return array<int, string> List of users
+     */
+    public function getUsers(): array
+    {
+        return $this->users;
+    }
+
+    /**
+     * Set the list of active users on the channel.
+     *
+     * @param array<int, string> $users List of usernames
+     */
+    public function setUsers(array $users): void
+    {
+        $this->users = array_map(fn($user) => $this->stripMode($user), $users);
     }
 }

@@ -4,41 +4,49 @@ declare(strict_types=1);
 
 namespace JesseGreathouse\PhpIrcClient\Messages;
 
-use
-    JesseGreathouse\PhpIrcClient\Exceptions\ParseChannelNameException,
+use JesseGreathouse\PhpIrcClient\Exceptions\ParseChannelNameException,
     JesseGreathouse\PhpIrcClient\Helpers\Event,
     JesseGreathouse\PhpIrcClient\IrcChannel,
-    JesseGreathouse\PhpIrcClient\IrcClient;
+    JesseGreathouse\PhpIrcClient\IrcClient,
+    JesseGreathouse\PhpIrcClient\IrcClientEvent;
 
-use \Exception;
-
+/**
+ * Represents a JOIN message in an IRC session.
+ */
 class JoinMessage extends IrcMessage
 {
+    /** @var string The nickname of the user joining the channel. */
     public string $user = '';
+
+    /** @var string The name of the channel being joined. */
     public string $channelName = '';
 
+    /**
+     * Constructs a JoinMessage instance and parses the input message.
+     *
+     * @param string $message The raw IRC JOIN message.
+     *
+     * @throws ParseChannelNameException If the channel name cannot be parsed.
+     */
     public function __construct(string $message)
     {
         parent::__construct($message);
         $this->channelName = $this->payload;
 
-        if (null !== $this->channelName && '' !== $this->channelName && '#' !== $this->channelName) {
+        if ($this->channelName !== '' && $this->channelName !== '#' && $this->channelName !== null) {
             $this->channel = new IrcChannel($this->channelName);
         } else {
             throw new ParseChannelNameException(self::class . " cannot parse channel name from: $message");
         }
 
-        $source = (!$this->source) ? '' : $this->source;
-        $user = strstr($source, '!', true);
-        if (false !== $user) $this->user = $user;
+        $this->user = strstr($this->source ?? '', '!', true) ?: '';
     }
 
     /**
-     * This function is always called after the message is parsed.
-     * The handle will only be executed once unless forced.
+     * Handles the JOIN message by updating the IRC client's channel state.
      *
-     * @param IrcClient $client A reference to the irc client object
-     * @param bool $force Force handling this message even if already handled
+     * @param IrcClient $client The IRC client instance.
+     * @param bool $force Whether to force handling if already handled.
      */
     public function handle(IrcClient $client, bool $force = false): void
     {
@@ -46,19 +54,21 @@ class JoinMessage extends IrcMessage
             return;
         }
 
-        if ('' !== $this->user && null !== $this->channel) {
+        if ($this->user !== '' && $this->channel !== null) {
             $client->getChannel($this->channel->getName())
                 ->addUser($this->user);
         }
     }
 
     /**
-     * @return array<int, Event>
+     * Retrieves the list of events triggered by this JOIN message.
+     *
+     * @return array<int, Event> The list of events associated with this message.
      */
     public function getEvents(): array
     {
         return [
-            new Event('joinInfo', [$this->user, $this->channelName]),
+            new Event(IrcClientEvent::JOIN, [$this->user, $this->channelName]),
         ];
     }
 }

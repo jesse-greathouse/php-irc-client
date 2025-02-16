@@ -4,26 +4,29 @@ declare(strict_types=1);
 
 namespace JesseGreathouse\PhpIrcClient;
 
+use JesseGreathouse\PhpIrcClient\Messages\{
+    ConsoleMessage,
+    CtcpMessage,
+    DccMessage,
+    IrcMessage,
+    JoinMessage,
+    InviteMessage,
+    KickMessage,
+    MOTDMessage,
+    ModeMessage,
+    NameReplyMessage,
+    NickMessage,
+    NoticeMessage,
+    PartMessage,
+    PingMessage,
+    PrivmsgMessage,
+    QuitMessage,
+    TopicChangeMessage,
+    VersionMessage,
+    WelcomeMessage
+};
+
 use Generator;
-use JesseGreathouse\PhpIrcClient\Messages\ConsoleMessage;
-use JesseGreathouse\PhpIrcClient\Messages\CtcpMessage;
-use JesseGreathouse\PhpIrcClient\Messages\DccMessage;
-use JesseGreathouse\PhpIrcClient\Messages\IrcMessage;
-use JesseGreathouse\PhpIrcClient\Messages\JoinMessage;
-use JesseGreathouse\PhpIrcClient\Messages\InviteMessage;
-use JesseGreathouse\PhpIrcClient\Messages\KickMessage;
-use JesseGreathouse\PhpIrcClient\Messages\MOTDMessage;
-use JesseGreathouse\PhpIrcClient\Messages\ModeMessage;
-use JesseGreathouse\PhpIrcClient\Messages\NameReplyMessage;
-use JesseGreathouse\PhpIrcClient\Messages\NickMessage;
-use JesseGreathouse\PhpIrcClient\Messages\NoticeMessage;
-use JesseGreathouse\PhpIrcClient\Messages\PartMessage;
-use JesseGreathouse\PhpIrcClient\Messages\PingMessage;
-use JesseGreathouse\PhpIrcClient\Messages\PrivmsgMessage;
-use JesseGreathouse\PhpIrcClient\Messages\QuitMessage;
-use JesseGreathouse\PhpIrcClient\Messages\TopicChangeMessage;
-use JesseGreathouse\PhpIrcClient\Messages\VersionMessage;
-use JesseGreathouse\PhpIrcClient\Messages\WelcomeMessage;
 
 class IrcMessageParser
 {
@@ -31,12 +34,12 @@ class IrcMessageParser
      * Parse one or more IRC messages.
      *
      * @param string $message A string received from the IRC server
-     * @return Generator|IrcMessage[]
+     * @return Generator|IrcMessage[] Parsed IRC messages as objects
      */
-    public function parse(string $message)
+    public function parse(string $message): Generator
     {
         foreach (explode("\r\n", $message) as $msg) {
-            if ('' === trim($msg)) {
+            if (trim($msg) === '') {
                 continue;
             }
 
@@ -45,74 +48,73 @@ class IrcMessageParser
     }
 
     /**
-     * Parse a single message to a corresponding object.
+     * Parse a single IRC message to a corresponding object.
+     *
+     * @param string $message The IRC message string to parse
+     * @return IrcMessage The parsed message object
      */
     private function parseSingle(string $message): IrcMessage
     {
         $command = $this->getCommand($message);
 
-        // Sometimes Parsing can fail due to malformed message.
-        // Just return empty Message Object.
-        if (false === $command) return new IrcMessage($message);
-
-        switch ($command) {
-            case 'VERSION':
-                return new VersionMessage($message);
-            case 'CTCP':
-                return new CtcpMessage($message);
-            case 'DCC':
-                return new DccMessage($message);
-            case 'JOIN':
-                return new JoinMessage($message);
-            case 'KICK':
-                return new KickMessage($message);
-            case 'PING':
-                return new PingMessage($message);
-            case 'PRIVMSG':
-                return new PrivmsgMessage($message);
-            case IrcCommand::RPL_WELCOME:
-                return new WelcomeMessage($message);
-            case 'TOPIC':
-            case IrcCommand::RPL_TOPIC:
-                return new TopicChangeMessage($message);
-            case IrcCommand::RPL_NAMREPLY:
-                return new NameReplyMessage($message);
-            case IrcCommand::RPL_MOTD:
-                return new MOTDMessage($message);
-            case 'MODE':
-                return new ModeMessage($message);
-            case 'NICK':
-                return new NickMessage($message);
-            case 'NOTICE':
-                return new NoticeMessage($message);
-            case 'INVITE':
-                return new InviteMessage($message);
-            case 'QUIT':
-                return new QuitMessage($message);
-            case 'PART':
-                return new PartMessage($message);
-            default:
-                // The 3 digit numeric commands are usually the server's console messaging.
-                if (false !== $command && (3 === strlen(trim($command))) && is_numeric($command)) {
-                    return new ConsoleMessage($message);
-                }
-
-                return new IrcMessage($message);
+        // Handle malformed message gracefully by returning a generic IrcMessage.
+        if ($command === false) {
+            return new IrcMessage($message);
         }
+
+        return match ($command) {
+            IrcEvent::VERSION => new VersionMessage($message),
+            IrcEvent::CTCP => new CtcpMessage($message),
+            IrcEvent::DCC => new DccMessage($message),
+            IrcEvent::JOIN => new JoinMessage($message),
+            IrcEvent::KICK => new KickMessage($message),
+            IrcEvent::PING => new PingMessage($message),
+            IrcEvent::PRIVMSG => new PrivmsgMessage($message),
+            IrcEvent::WELCOME => new WelcomeMessage($message),
+            IrcEvent::TOPIC, IrcEvent::RPL_TOPIC => new TopicChangeMessage($message),
+            IrcEvent::NAMREPLY => new NameReplyMessage($message),
+            IrcEvent::MOTD => new MOTDMessage($message),
+            IrcEvent::MODE => new ModeMessage($message),
+            IrcEvent::NICK => new NickMessage($message),
+            IrcEvent::NOTICE => new NoticeMessage($message),
+            IrcEvent::INVITE => new InviteMessage($message),
+            IrcEvent::QUIT => new QuitMessage($message),
+            IrcEvent::PART => new PartMessage($message),
+            default => $this->parseNumericCommand($command, $message)
+        };
     }
 
     /**
-     * Get the COMMAND part of an IRC message.
+     * Parse the command part of an IRC message.
+     *
+     * @param string $message The IRC message to parse
+     * @return bool|string The command or false if not found
      */
-    private function getCommand(string $message): bool | string
+    private function getCommand(string $message): bool|string
     {
+        // Skip the leading colon if present, then get the command
         if ($message[0] === ':') {
-            $s = strstr($message, ' ');
-            if (false !== $s) {
-                $message = $s;
-            }
+            $message = strstr($message, ' ') ?: '';
         }
 
-        return strstr(trim($message), ' ', true);
+        return strstr(trim($message), ' ', true) ?: false;
+    }
+
+    /**
+     * Parse numeric commands, often from the server console.
+     *
+     * @param string $command The command to check
+     * @param string $message The raw message
+     * @return IrcMessage The corresponding message object
+     */
+    private function parseNumericCommand(string $command, string $message): IrcMessage
+    {
+        // If it's a 3-digit numeric code (usually from the server console)
+        if (strlen(trim($command)) === 3 && is_numeric($command)) {
+            return new ConsoleMessage($message);
+        }
+
+        // Default return for unknown commands
+        return new IrcMessage($message);
     }
 }

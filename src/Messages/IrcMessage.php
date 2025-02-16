@@ -4,28 +4,47 @@ declare(strict_types=1);
 
 namespace JesseGreathouse\PhpIrcClient\Messages;
 
-use JesseGreathouse\PhpIrcClient\Helpers\Event;
-use JesseGreathouse\PhpIrcClient\IrcChannel;
-use JesseGreathouse\PhpIrcClient\IrcClient;
+use JesseGreathouse\PhpIrcClient\Helpers\Event,
+    JesseGreathouse\PhpIrcClient\IrcChannel,
+    JesseGreathouse\PhpIrcClient\IrcClient;
 
+/**
+ * Represents a generic IRC message with parsing and event handling capabilities.
+ */
 class IrcMessage
 {
+    /** @var IrcChannel|null The IRC channel associated with this message, if applicable. */
     public ?IrcChannel $channel = null;
-    protected ?string $commandsuffix = null;
+
+    /** @var string|null The command suffix, if present. */
+    protected ?string $commandSuffix = null;
+
+    /** @var bool Indicates whether this message has been handled. */
     protected bool $handled = false;
+
+    /** @var string The payload or message content. */
     protected string $payload = '';
+
+    /** @var string|null The source of the message, usually a nickname. */
     protected ?string $source = null;
+
+    /** @var string|null The target of the message, such as a user or channel. */
     public ?string $target = null;
 
+    /**
+     * Initializes an IRC message and parses its components.
+     *
+     * @param string $command The raw IRC command string.
+     */
     public function __construct(protected string $command)
     {
         $this->parse($this->command);
     }
 
     /**
-     * Returns the parsed payload.
+     * Returns the parsed payload of the message.
      *
-     * @return string
+     * @return string The message payload.
      */
     public function getPayload(): string
     {
@@ -33,11 +52,10 @@ class IrcMessage
     }
 
     /**
-     * This function is always called after the message is parsed.
-     * The handle will only be executed once unless forced.
+     * Handles the message using the provided IRC client.
      *
-     * @param IrcClient $client A reference to the irc client object
-     * @param bool $force Force handling this message even if already handled
+     * @param IrcClient $client The IRC client instance.
+     * @param bool $force Whether to force handling if already handled.
      */
     public function handle(IrcClient $client, bool $force = false): void
     {
@@ -47,8 +65,9 @@ class IrcMessage
     }
 
     /**
-     * Get the events that should be invoked for this message.
-     * @return array<int, Event>
+     * Retrieves an array of events triggered by this message.
+     *
+     * @return Event[] List of events associated with this message.
      */
     public function getEvents(): array
     {
@@ -56,49 +75,49 @@ class IrcMessage
     }
 
     /**
-     * Inject the list of IRC channels.
-     * The messages can use this to gather information of the channel if needed.
-     * @param array<string, IrcChannel> $channels
+     * Injects a list of known IRC channels into this message instance.
+     *
+     * @param array<string, IrcChannel> $channels Associative array of channels.
      */
     public function injectChannel(array $channels): void
     {
-        if (array_key_exists($this->target, $channels)) {
+        if (isset($channels[$this->target])) {
             $this->channel = $channels[$this->target];
         }
     }
 
     /**
-     * Parse the IRC command string to local properties.
+     * Parses the raw IRC command string and extracts its components.
+     *
+     * @param string $command The raw command string.
      */
     protected function parse(string $command): void
     {
         $command = trim($command);
-        $i = 0;
 
-        if ($command[0] === ':' && false !== strpos($command, ' ')) {
-            $i = (int)strpos($command, ' ');
-            $this->source = substr($command, 1, $i - 1);
-
-            $i++;
-        }
-
-        $j = strpos($command, ' ', $i);
-        if ($j !== false) {
-            $this->command = substr($command, $i, $j - $i);
-        } else {
-            $this->command = substr($command, $i);
-
-            return;
-        }
-
-        $i = strpos($command, ':', $j);
-        if ($i !== false) {
-            if ($i !== $j + 1) {
-                $this->commandsuffix = substr($command, $j + 1, $i - $j - 2);
+        // Extract source if present
+        if (str_starts_with($command, ':')) {
+            $parts = explode(' ', $command, 3);
+            if (count($parts) < 2) {
+                return;
             }
-            $this->payload = substr($command, $i + 1);
+            $this->source = substr($parts[0], 1);
+            $this->command = $parts[1];
+            $command = $parts[2] ?? ''; // Correctly preserve the remaining portion
         } else {
-            $this->commandsuffix = substr($command, $j + 1);
+            $parts = explode(' ', $command, 2);
+            $this->command = $parts[0];
+            $command = $parts[1] ?? '';
+        }
+
+        // Extract command suffix and payload if present
+        if (str_contains($command, ':')) {
+            [$suffix, $payload] = explode(':', $command, 2);
+            $this->commandSuffix = trim($suffix);
+            $this->payload = $payload;
+        } else {
+            $this->commandSuffix = trim($command);
         }
     }
+
 }

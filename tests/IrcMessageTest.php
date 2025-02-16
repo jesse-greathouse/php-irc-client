@@ -31,7 +31,7 @@ class IrcMessageTest extends TestCase
 
         $this->assertSame('JesseGreathouse!~JesseGreathouse@foo.bar.be', $this->getPrivate($msg, 'source'));
         $this->assertSame('372', $this->getPrivate($msg, 'command'));
-        $this->assertSame('IrcBot', $this->getPrivate($msg, 'commandsuffix'));
+        $this->assertSame('IrcBot', $this->getPrivate($msg, 'commandSuffix'));
         $this->assertSame('Message of the day', $this->getPrivate($msg, 'payload'));
     }
 
@@ -41,7 +41,7 @@ class IrcMessageTest extends TestCase
 
         $this->assertSame('JesseGreathouse!~JesseGreathouse@foo.bar.be', $this->getPrivate($msg, 'source'));
         $this->assertSame('353', $this->getPrivate($msg, 'command'));
-        $this->assertSame('IrcBot = #channel', $this->getPrivate($msg, 'commandsuffix'));
+        $this->assertSame('IrcBot = #channel', $this->getPrivate($msg, 'commandSuffix'));
         $this->assertSame('IrcBot @Q OtherUser', $this->getPrivate($msg, 'payload'));
         $this->assertSame('#channel', $msg->channel->getName());
         $this->assertSame(['IrcBot', '@Q', 'OtherUser'], $msg->names);
@@ -53,7 +53,7 @@ class IrcMessageTest extends TestCase
 
         $this->assertSame('JesseGreathouse!~JesseGreathouse@foo.bar.be', $this->getPrivate($msg, 'source'));
         $this->assertSame('TOPIC', $this->getPrivate($msg, 'command'));
-        $this->assertSame('#channel', $this->getPrivate($msg, 'commandsuffix'));
+        $this->assertSame('#channel', $this->getPrivate($msg, 'commandSuffix'));
         $this->assertSame('The newest channel topic!', $this->getPrivate($msg, 'payload'));
     }
 
@@ -75,7 +75,7 @@ class IrcMessageTest extends TestCase
         $this->assertSame('JesseGreathouse', $msg->user);
         $this->assertSame('PRIVMSG', $this->getPrivate($msg, 'command'));
         $this->assertSame('#channel', $msg->target);
-        $this->assertSame('#channel', $this->getPrivate($msg, 'commandsuffix'));
+        $this->assertSame('#channel', $this->getPrivate($msg, 'commandSuffix'));
         $this->assertSame('Hello World!', $msg->message);
         $this->assertSame('Hello World!', $this->getPrivate($msg, 'payload'));
     }
