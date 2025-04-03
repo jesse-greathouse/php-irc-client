@@ -17,8 +17,8 @@ class KickMessage extends IrcMessage
     /** @var string The nickname of the user who kicked the bot. */
     public string $kicker;
 
-    /** @var string The nickname of the user being kicked. */
-    public string $user;
+    /** @var string|null The nickname of the user being kicked. */
+    public ?string $user;
 
     /**
      * Constructor for the KickMessage class.
